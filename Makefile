@@ -8,6 +8,10 @@ SRC_DIR     = $(ROOT_DIR)/src
 TEST_DIR    = $(ROOT_DIR)/test
 TEST_FILE   = $(ROOT_DIR)/tests.o
  
+ifneq ($(strip $(shell which xcpretty)),)
+	XCPRETTY_TEST = 2>&1 >/dev/null | xcpretty --test --color --simple
+endif
+
 ifeq ($(CONFIG), debug)
     CFLAGS=-Onone -g
 else
@@ -27,7 +31,7 @@ build-tests:
 	@$(SWIFTC) -sdk $(SDK_PATH) -F/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks -Xlinker -rpath -Xlinker /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks -lswiftCore $(SWIFT_TEST_FILES) -I "." -L "." -l$(MODULE_NAME) -module-link-name $(MODULE_NAME) -o $(TEST_FILE)
 
 test: build-tests
-	@xcrun xctest $(TEST_FILE)
+	@xcrun xctest $(TEST_FILE) $(XCPRETTY_TEST)
 
 clean:
 	@rm -rf *.swiftdoc *.swiftmodule *.dylib $(TEST_FILE)
